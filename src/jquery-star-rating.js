@@ -1,6 +1,6 @@
 /*!
  * 基于jQuery的星级评价小插件
- * 
+ *
  * @link https://github.com/zhanguangcheng/jquery-star-rating
  * @author Grass <14712905@qq.com>
  * @version 0.1
@@ -10,8 +10,6 @@
         define(['jquery'], factory);
     } else if (typeof exports == 'object') {
         module.exports = factory(require('jquery'));
-    } else if (typeof layui == 'object') {
-        layui.define('jquery', factory);
     } else {
         factory(jQuery);
     }
@@ -19,6 +17,7 @@
     "use strict"
 
     var defaultOptions = {
+        readonly: false,
         defaultStar: 0,
         starNumber: 5,
         step: 0.5,
@@ -51,6 +50,13 @@
 
         $.each(this, function () {
             var $this = $(this);
+            var elementOptions = {};
+            $.each(['readonly', 'defaultStar', 'starNumber', 'step', 'theme', 'starWidth', 'starHeight'], function(i, attr) {
+                if ($this.data(attr)) {
+                    elementOptions[attr] = $this.data(attr);
+                }
+            });
+            options = $.extend({}, options, elementOptions);
             var currentStar = options.defaultStar;
             var currentHoverStar;
 
@@ -72,6 +78,9 @@
 
             /** process event */
             showStar($this, currentStar);
+            if (options.readonly) {
+                return;
+            }
             $this.on('mousemove', function (event) {
                 var star = getStar(event.offsetX);
                 if (currentHoverStar != star) {
