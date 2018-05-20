@@ -3,7 +3,7 @@
  *
  * @link https://github.com/zhanguangcheng/jquery-star-rating
  * @author Grass <14712905@qq.com>
- * @version 0.1
+ * @version 0.2
  */
 (function (factory) {
     if (typeof define == 'function' && define.amd) {
@@ -21,7 +21,7 @@
         defaultStar: 0,
         starNumber: 5,
         step: 0.5,
-        theme: 'images/default.jpg',
+        theme: 'default',
         eventHover: function (event, star, options) { },
         eventOut: function (event, star, options) { },
         eventChange: function (event, star, options) { },
@@ -30,8 +30,36 @@
         starHeight: 24,
     };
 
+    var loadedCss = {};
+    
+    var loadCss = function(url) {
+        if (loadedCss[url]) return;
+        loadedCss[url] = true;
+        var head = document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+        link.href = url;
+        head.appendChild(link);
+    }
+
+    var rootPath = (function() {
+        var path = document.currentScript ? document.currentScript.src : function () {
+            var scripts = document.scripts;
+            var n = scripts.length - 1;
+            for (var i = n; i > 0; i--) {
+                if ("interactive" === scripts[i].readyState) {
+                    return scripts[i].src;
+                }
+            }
+            return scripts[n].src;
+        }();
+        return path.substring(0, path.lastIndexOf("/") + 1);
+    })();
+
     $.fn.starRating = function (options) {
         options = $.extend({}, defaultOptions, options);
+        loadCss(rootPath + 'theme/' + options.theme + '/star-rating.css');
         var getStar = function (x) {
             return Math.ceil((x / options.starWidth).toFixed(1) / options.step) / (1 / options.step);
         };
@@ -65,15 +93,14 @@
             $this.bind('starRating:out', options.eventOut);
             $this.bind('starRating:change', options.eventChange);
             $this.html('<div class="choose-star"></div>');
+            $this.addClass('star-rating-wrap');
             $this.css({
                 width: options.starWidth * options.starNumber,
-                height: options.starHeight,
-                background: 'url(' + options.theme + ') repeat-x left top',
+                height: options.starHeight
             });
             $this.find('.choose-star').css({
                 width: options.starWidth * options.defaultStar,
-                height: options.starHeight,
-                background: 'url(' + options.theme + ') repeat-x left top',
+                height: options.starHeight
             });
 
             /** process event */
@@ -94,6 +121,7 @@
                 $this.trigger('starRating:out', [currentStar, options]);
             }).on('click', function (event) {
                 currentStar = getStar(event.offsetX);
+                $this.attr('data-star', currentStar);
                 $this.trigger('starRating:change', [currentStar, options]);
             });
         })
