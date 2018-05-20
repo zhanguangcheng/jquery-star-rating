@@ -1,4 +1,5 @@
 # jquery-star-rating
+
 基于jQuery的星级评价小插件，[查看demo](https://zhanguangcheng.github.io/jquery-star-rating/demo)
 
 ## 快速使用
